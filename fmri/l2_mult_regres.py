@@ -270,6 +270,7 @@ if __name__ == '__main__':
                                     flamemodel=args.flamemodel,
                                     nonparametric=args.nonparametric)
     wf.config['execution']['poll_sleep_duration'] = args.sleep
+    wf.config['execution']['job_finished_timeout'] = 5
 
     if args.plugin_args:
         wf.run(args.plugin, plugin_args=eval(args.plugin_args))
