@@ -12,9 +12,6 @@ info_dict = dict(
     data="fszstatcope2_means_nz.csv"
 )
 
-voxel_threshold = 116
-data_sets = prelim.load_data_and_preproc(info_dict, voxel_threshold)
-
 from sklearn.pipeline import Pipeline
 from sklearn import linear_model
 from sklearn.preprocessing import StandardScaler
