@@ -55,7 +55,7 @@ def rf_feature_selector(data, y, thresh, cv, clf, max_feat=10):
             y_shuff = np.copy(y[train])
             np.random.shuffle(y_shuff)
             clf.fit(X_transform, y_shuff)
-            results_null["pred"][idx] = clf.predict(sfm.transform(X[test]))
+            results_null[idx] = clf.predict(sfm.transform(X[test]))
         except:
             print("couldn't compute null model iteration: {}".format(idx))
 
