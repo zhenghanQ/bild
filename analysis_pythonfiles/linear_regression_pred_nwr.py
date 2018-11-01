@@ -28,13 +28,14 @@ ds = [
     ("adols_adults", "adols_adults_behav")
 ]
 
+data_sets = prelim.load_data_and_preproc(info_dict, vxt_vals[0])
 
 # within group test kids only
 kid_idx = data_sets["behav"].young_kid.values.astype(bool)
 kid_roi = data_sets["roi_data"][kid_idx]
 kid_behav = data_sets["behav"][kid_idx]
 kX = kid_roi.values
-ky = kid_behav["5syl_acc"].values
+ky = utils.rau_transform(kid_behav["total_acc"].values)
 
 kclf = Pipeline([
     ("sc", StandardScaler()),
@@ -44,11 +45,25 @@ kclf = Pipeline([
 kxpred = np.zeros(kX.shape[0])
 
 for idx, (train, test) in enumerate(LeaveOneOut().split(kX, ky)):
-    clf.fit(kX[train], ky[train])
-    kxpred[idx] = clf.predict(kX[test])
+    kclf.fit(kX[train], ky[train])
+    kxpred[idx] = kclf.predict(kX[test])
 
 kr2 = explained_variance_score(ky, kxpred)
 
+#plt.scatter(x, y, c=label, cmap=matplotlib.colors.ListedColormap(colors))
+cvar = kid_behav["age"].values
+plt.scatter(
+        kid_behav["total_acc"].values, 
+        ky, 
+        c=cvar,
+        cmap=plt.get_cmap("Blues"),
+        edgecolor="black"
+)
+
+cb = plt.colorbar()
+plt.xlabel("total_acc")
+plt.ylabel("rau_transform(total_acc)")
+plt.show()
 
 # within group adol
 adol_idx = data_sets["behav"].old_kid.values.astype(bool)
