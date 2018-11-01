@@ -114,6 +114,9 @@ def extract_from_dict(indict, mod_type, use_cols, niters, npars):
 
     return Counter(feats), imps
 
+def pval(cval, nulls):
+    return (sum(nulls >= cval) + 1) / (len(nulls) + 1)
+
 alt_rdata = extract_from_dict(global_results, "alt", use_data.columns.values, total_iters, npars)
 
 # plot and save roc histogram
