@@ -40,12 +40,19 @@ def extract_from_cope(cope_path, mask_path):
 zthresh = 3.09
 cope_dir = "/om/project/bild/Analysis/task_openfmri/first_level/output_dir_071616/model01/task001/{}/copes/mni/cope02.nii.gz"
 zstat_path = "/om/project/bild/Analysis/task_openfmri/second_level/l2output_29_f1_sd_3.09/output_dir/model001/task001/all/stats/contrast_2/zstat1_threshold.nii.gz"
+<<<<<<< HEAD
 work_dir = "/om/scratch/Mon/ysa/"
 roi_path = "/om/project/bild/Analysis/task_openfmri/misc/freesurfer_aparc_aseg_masks_mni/"
 #sub_dict = utils.read_pickle("/om/project/bild/Analysis/task_openfmri/scripts/fmri/subj_dict_76.pkl")
 rois = os.listdir(roi_path)
 #allsubs = [i for x in sub_dict.keys() for i in sub_dict[x]]
 allsubs = pd.read_csv("/om/user/ysa/validation_set_behav.csv", index_col=0).index
+=======
+work_dir = "/om/scratch/Sat/ysa/"
+roi_path = "/om/project/bild/Analysis/task_openfmri/misc/freesurfer_aparc_aseg_masks_mni/"
+sub_dict = utils.read_pickle("/om/project/bild/Analysis/task_openfmri/scripts/fmri/subj_dict_76.pkl")
+rois = os.listdir(roi_path)
+allsubs = [i for x in sub_dict.keys() for i in sub_dict[x]]
 
 df_vals = pd.DataFrame(
     data=np.zeros((len(allsubs), len(rois))),
@@ -73,7 +80,8 @@ df_vals_nz = df_vals.iloc[:, cols_nonzero]
 diff_n_voxels = np.where(df_voxels_nz.std(0) != 0.0)
 
 save_path = "/om/project/bild/Analysis/task_openfmri/second_level/fszstat_roiconj"
-df_vals.to_csv(os.path.join(save_path, "fszstatcope2_means_all_valset.csv"))
-df_voxels.to_csv(os.path.join(save_path, "fszstatcope2_nvoxels_all_valset.csv"))
-df_voxels_nz.to_csv(os.path.join(save_path, "fszstatcope2_nvoxels_nz_valset.csv"))
-df_vals_nz.to_csv(os.path.join(save_path, "fszstatcope2_means_nz_valset.csv"))
+
+df_vals.to_csv(os.path.join(save_path, "fszstatcope2_means_all.csv"))
+df_voxels.to_csv(os.path.join(save_path, "fszstatcope2_nvoxels_all.csv"))
+df_voxels_nz.to_csv(os.path.join(save_path, "fszstatcope2_nvoxels_nz.csv"))
+df_vals_nz.to_csv(os.path.join(save_path, "fszstatcope2_means_nz.csv"))
