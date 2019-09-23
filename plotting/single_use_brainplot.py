@@ -29,8 +29,8 @@ import math
 
 
 img = nb.load('/om/user/ysa/rfMRI_REST1_LR_Atlas.dtseries.nii') 
-mim = img.header.matrix.mims[1]
-bm1 = mim.brain_models[0]
+mim = img.header.matrix._mims[1]
+bm1 = mim.brain_models
 lidx = bm1.vertex_indices.indices
 bm2 = mim.brain_models[1]
 ridx = bm1.surface_number_of_vertices + bm2.vertex_indices.indices

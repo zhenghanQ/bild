@@ -153,6 +153,7 @@ def create_reg_workflow(name='registration'):
     mean2anatbbr.inputs.cost = 'bbr'
     mean2anatbbr.inputs.schedule = os.path.join(os.getenv('FSLDIR'),
                                                 'etc/flirtsch/bbr.sch')
+    mean2anatbbr.plugin_args = {'sbatch_args': '--mem=12G -c 2'}
     register.connect(inputnode, 'mean_image', mean2anatbbr, 'in_file')
     register.connect(binarize, 'out_file', mean2anatbbr, 'wm_seg')
     register.connect(inputnode, 'anatomical_image', mean2anatbbr, 'reference')
@@ -206,8 +207,7 @@ def create_reg_workflow(name='registration'):
     reg.inputs.args = '--float'
     reg.inputs.output_warped_image = 'output_warped_image.nii.gz'
     reg.inputs.num_threads = 4
-    reg.plugin_args = {'qsub_args': '-pe orte 4', 
-                       'sbatch_args': '--mem=6G -c 4'}
+    reg.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     register.connect(stripper, 'out_file', reg, 'moving_image')
     register.connect(inputnode,'target_image_brain', reg,'fixed_image')
 
@@ -219,6 +219,7 @@ def create_reg_workflow(name='registration'):
     pickfirst = lambda x: x[0]
 
     merge = pe.Node(niu.Merge(2), iterfield=['in2'], name='mergexfm')
+    merge.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     register.connect(convert2itk, 'itk_transform', merge, 'in2')
     register.connect(reg, 'composite_transform', merge, 'in1')
     #register.connect(reg, ('composite_transform', pickfirst), merge, 'in1')
@@ -233,7 +234,7 @@ def create_reg_workflow(name='registration'):
     warpmean.inputs.interpolation = 'Linear'
     warpmean.inputs.invert_transform_flags = [False, False]
     warpmean.inputs.terminal_output = 'file'
-
+    warpmean.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     register.connect(inputnode,'target_image_brain', warpmean,'reference_image')
     register.connect(inputnode, 'mean_image', warpmean, 'input_image')
     register.connect(merge, 'out', warpmean, 'transforms')
@@ -249,7 +250,7 @@ def create_reg_workflow(name='registration'):
     warpall.inputs.interpolation = 'Linear'
     warpall.inputs.invert_transform_flags = [False, False]
     warpall.inputs.terminal_output = 'file'
-
+    warpall.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     register.connect(inputnode,'target_image_brain',warpall,'reference_image')
     register.connect(inputnode,'source_files', warpall, 'input_image')
     register.connect(merge, 'out', warpall, 'transforms')
@@ -334,6 +335,7 @@ def create_fs_reg_workflow(name='registration'):
     bbregister.inputs.contrast_type = 't2'
     bbregister.inputs.out_fsl_file = True
     bbregister.inputs.epi_mask = True
+    bbregister.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     register.connect(inputnode, 'subject_id', bbregister, 'subject_id')
     register.connect(inputnode, 'mean_image', bbregister, 'source_file')
     register.connect(inputnode, 'subjects_dir', bbregister, 'subjects_dir')
@@ -368,6 +370,7 @@ def create_fs_reg_workflow(name='registration'):
     convert2itk = Node(C3dAffineTool(), name='convert2itk')
     convert2itk.inputs.fsl2ras = True
     convert2itk.inputs.itk_transform = True
+    convert2itk.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     register.connect(bbregister, 'out_fsl_file', convert2itk, 'transform_file')
     register.connect(inputnode, 'mean_image',convert2itk, 'source_file')
     register.connect(stripper, 'out_file', convert2itk, 'reference_file')
@@ -407,8 +410,7 @@ def create_fs_reg_workflow(name='registration'):
     reg.inputs.args = '--float'
     reg.inputs.output_warped_image = 'output_warped_image.nii.gz'
     reg.inputs.num_threads = 4
-    reg.plugin_args = {'qsub_args': '-pe orte 4', 
-                       'sbatch_args': '--mem=6G -c 4'}
+    reg.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     register.connect(stripper, 'out_file', reg, 'moving_image')
     register.connect(inputnode,'target_image', reg,'fixed_image')
 
@@ -420,6 +422,7 @@ def create_fs_reg_workflow(name='registration'):
     pickfirst = lambda x: x[0]
 
     merge = Node(Merge(2), iterfield=['in2'], name='mergexfm')
+    merge.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     register.connect(convert2itk, 'itk_transform', merge, 'in2')
     register.connect(reg, 'composite_transform', merge, 'in1')
     #register.connect(reg, ('composite_transform', pickfirst), merge, 'in1')
@@ -433,6 +436,7 @@ def create_fs_reg_workflow(name='registration'):
     warpmean.inputs.invert_transform_flags = [False, False]
     warpmean.inputs.terminal_output = 'file'
     warpmean.inputs.args = '--float'
+    warpmean.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     #warpmean.inputs.num_threads = 4
     #warpmean.plugin_args = {'sbatch_args': '--mem=4G -c 4'}
 
@@ -449,7 +453,7 @@ def create_fs_reg_workflow(name='registration'):
     warpall.inputs.terminal_output = 'file'
     warpall.inputs.args = '--float'
     warpall.inputs.num_threads = 2
-    warpall.plugin_args = {'sbatch_args': '--mem=6G -c 2'}
+    warpall.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
 
     """
     Assign all the output files
@@ -735,13 +739,13 @@ def analyze_openfmri_dataset(data_dir, subject=None, model_id=None,
                      iterfield=['realigned_files', 'realignment_parameters',
                                 'mask_file'],
                      name="art")
-
+    art.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     modelspec = pe.Node(interface=model.SpecifySparseModel(),
                            name="modelspec") #GAC, changed to SpecifySparseModel
     modelspec.inputs.input_units = 'secs'
     modelspec.inputs.stimuli_as_impulses=False #GAC, added but not sure if this is relevant
     modelspec.inputs.model_hrf=True # GAC added 2/8/2015
-
+    modelspec.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     def check_behav_list(behav, run_id, conds):
         from nipype.external import six
         import numpy as np
@@ -791,6 +795,7 @@ def analyze_openfmri_dataset(data_dir, subject=None, model_id=None,
 
     # Comute TSNR on realigned data regressing polynomials upto order 2
     tsnr = MapNode(TSNR(regress_poly=2), iterfield=['in_file'], name='tsnr')
+    tsnr.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     wf.connect(preproc, "outputspec.realigned_files", tsnr, "in_file")
 
     # Compute the median image across runs
@@ -870,6 +875,7 @@ def analyze_openfmri_dataset(data_dir, subject=None, model_id=None,
                                    output_names=['out_files', 'splits'],
                                    function=merge_files),
                       name='merge_files')
+    mergefunc.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
     wf.connect([(fixed_fx.get_node('outputspec'), mergefunc,
                                  [('copes', 'copes'),
                                   ('varcopes', 'varcopes'),
@@ -902,6 +908,7 @@ def analyze_openfmri_dataset(data_dir, subject=None, model_id=None,
         get_roi_tsnr = pe.MapNode(fs.SegStats(default_color_table=True), 
                                   iterfield=['in_file'], name='get_aparc_tsnr')
         get_roi_tsnr.inputs.avgwf_txt_file = True
+        get_roi_tsnr.plugin_args = {'sbatch_args': '--mem=12G -c 4'}
         wf.connect(tsnr, 'tsnr_file', get_roi_tsnr, 'in_file')
         wf.connect(registration, 'outputspec.aparc', get_roi_tsnr, 'segmentation_file')
         
