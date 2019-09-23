@@ -4,18 +4,6 @@ INFO ON HOW TO RUN THESE SCRIPTS
 
 ********************************
 
-
-***********************************************************************************************
-***********************************************************************************************
-
-IMPORTANT:
- 
-	If you don't know how to call(run) any or some of these scripts, STOP, DON'T RUN ANYTHING.
-	First learn some basic python and bash. Otherwise you'll end up making a lot of errors.
-
-***********************************************************************************************
-***********************************************************************************************
-
 * get_dicoms.py
 
 	python get_dicoms.py -u user -s subid -dd /path/to/directory/where/dicoms/are/stored
